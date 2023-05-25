@@ -22,11 +22,8 @@ ${"\r"}NK1|1|NUCLEAR^NELDA^W|SPO^SPOUSE||||NK^NEXT OF KIN${"\r"}PV1|1|I|2000^201
 004777^ATTEND^AARON^A|||SUR||||ADM|A0|`;
 
 service / on new http:Listener(8000) {
-    resource function post message(@http:Payload byte[] data) returns byte[]|error{
-        string|error fromBytes = string:fromBytes(data);
-        if fromBytes is string {
-            log:printInfo("Received HL7 Message: " + fromBytes);
-        }
+    resource function post message(@http:Payload string data) returns string|error {
+        log:printInfo("Received HL7 Message: ", data = data);
 
         // Note: When you know the message type you can directly get it parsed.
         // hl7v23:QRY_A19|error parsedMsg = hl7v2:parse(data).ensureType(hl7v23:QRY_A19);
@@ -86,7 +83,7 @@ service / on new http:Listener(8000) {
         // }
         // log:printInfo("Sending ACK: ", message = ackStr);
         // return encodedMsg;
-        return [];
+        return "success";
     }
 }
 
@@ -94,7 +91,7 @@ service / on new http:Listener(8000) {
 //     *tcp:ConnectionService;
 
 //     remote function onBytes(tcp:Caller caller, readonly & byte[] data) returns byte[]|tcp:Error? {
-        
+
 //     }
 
 //     remote function onError(tcp:Error err) {
