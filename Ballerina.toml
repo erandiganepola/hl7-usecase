@@ -1,0 +1,8 @@
+[package]
+org = "erandiganepola"
+name = "hl7_usecase"
+version = "0.1.0"
+distribution = "2201.5.0"
+
+[build-options]
+observabilityIncluded = true
