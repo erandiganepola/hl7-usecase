@@ -5,6 +5,7 @@ import ballerina/sql;
 import ballerinax/health.hl7v23;
 import ballerina/uuid;
 import ballerina/http;
+import ballerina/mime;
 import ballerinax/mysql.driver as _;
 
 configurable string host = ?;
@@ -15,10 +16,19 @@ configurable int port = ?;
 
 service / on new http:Listener(8000) {
     resource function post message(@http:Payload string data) returns string|error {
+        byte[]|mime:DecodeError base64Decode = mime:base64DecodeBlob(data.toBytes());
+        byte[] decoded;
+        if base64Decode is byte[] {
+            decoded = base64Decode;
+        } else {
+            log:printInfo("Error occurred while decoding the base64 encoded message");
+            return error("failed to decode");
+        }
+
         log:printInfo("Received HL7 Message: ", data = data);
 
         // Note: When you know the message type you can directly get it parsed.
-        hl7v23:QRY_A19|error parsedMsg = hl7v2:parse(data).ensureType(hl7v23:QRY_A19);
+        hl7v23:QRY_A19|error parsedMsg = hl7v2:parse(decoded).ensureType(hl7v23:QRY_A19);
         if parsedMsg is error {
             return error("Error occurred while parsing the received message", parsedMsg);
         }
